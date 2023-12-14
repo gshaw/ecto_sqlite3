@@ -125,24 +125,44 @@ defmodule Ecto.Integration.TimestampsTest do
 
   test "insert and fetch nil values" do
     now = DateTime.utc_now()
+    assert now != DateTime.truncate(now, :second)
 
     {:ok, product} =
       %Product{}
-      |> Product.changeset(%{name: "Nil Date Test", approved_at: now, ordered_at: now})
+      |> Product.changeset(%{
+        name: "Nil Date Test",
+        requested_at: now,
+        approved_at: now,
+        ordered_at: now,
+        received_at: now
+      })
       |> TestRepo.insert()
 
     product = TestRepo.get(Product, product.id)
     assert product.name == "Nil Date Test"
+    assert product.requested_at != now
     assert product.approved_at != now
     assert product.ordered_at != now
+    assert product.received_at == now
+    assert product.requested_at == DateTime.to_naive(now)
     assert product.approved_at == DateTime.truncate(now, :second) |> DateTime.to_naive()
     assert product.ordered_at == DateTime.truncate(now, :second)
+    IO.inspect(product, label: "product")
 
-    changeset = Product.changeset(product, %{approved_at: nil, ordered_at: nil})
+    changeset =
+      Product.changeset(product, %{
+        requested_at: nil,
+        approved_at: nil,
+        ordered_at: nil,
+        received_at: nil
+      })
+
     TestRepo.update(changeset)
     product = TestRepo.get(Product, product.id)
+    assert product.requested_at == nil
     assert product.approved_at == nil
     assert product.ordered_at == nil
+    assert product.received_at == nil
   end
 
   test "datetime comparisons" do

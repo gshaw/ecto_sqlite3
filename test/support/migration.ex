@@ -30,8 +30,10 @@ defmodule EctoSQLite3.Integration.Migration do
       add(:external_id, :uuid)
       add(:bid, :binary_id)
       add(:tags, {:array, :string})
+      add(:requested_at, :naive_datetime_usec)
       add(:approved_at, :naive_datetime)
       add(:ordered_at, :utc_datetime)
+      add(:received_at, :utc_datetime_usec)
       add(:price, :decimal)
       timestamps()
     end

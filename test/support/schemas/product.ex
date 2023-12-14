@@ -13,8 +13,10 @@ defmodule EctoSQLite3.Schemas.Product do
     field(:external_id, Ecto.UUID)
     field(:bid, :binary_id)
     field(:tags, {:array, :string}, default: [])
+    field(:requested_at, :naive_datetime_usec)
     field(:approved_at, :naive_datetime)
     field(:ordered_at, :utc_datetime)
+    field(:received_at, :utc_datetime_usec)
     field(:price, :decimal)
 
     belongs_to(:account, Account)
@@ -24,7 +26,16 @@ defmodule EctoSQLite3.Schemas.Product do
 
   def changeset(struct, attrs) do
     struct
-    |> cast(attrs, [:name, :description, :tags, :account_id, :approved_at, :ordered_at])
+    |> cast(attrs, [
+      :name,
+      :description,
+      :tags,
+      :account_id,
+      :requested_at,
+      :approved_at,
+      :ordered_at,
+      :received_at
+    ])
     |> validate_required([:name])
     |> maybe_generate_external_id()
   end
